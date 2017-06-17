@@ -2,7 +2,9 @@ import React from "react";
 import { Route, IndexRoute, Router, browserHistory } from "react-router";
 
 import Main from "../components/Main";
+import Favorited from "../components/Favorited";
 import Input from "../components/quotes/Input";
+import Quotes from "../components/quotes/Quotes";
 import Panel from "../components/QuotesPanel";
 
 
@@ -15,7 +17,7 @@ const routes = (
     <Route path="/" component={Main}>
       {/* If user selects Search or Saved show the appropriate component */}
       
-      <Route path="Favorited" component={Input} />
+      <Route path="Favorited" component={Favorited} />
       
       {/* If user selects Search or Saved show the appropriate component */}
       <IndexRoute component={Panel} />

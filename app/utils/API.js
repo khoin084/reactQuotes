@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = {
+var API = {
   // getQuotes returns all quotes from out db
   getQuotes: function() {
     return axios.get("/api/quotes");
@@ -24,4 +24,5 @@ const API = {
   }
 };
 
-export default API;
+// We export the helpers function
+module.exports = API;

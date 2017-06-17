@@ -1,64 +1,124 @@
 // Include React as a dependency
 var React = require("react");
 
+// Include the Helper (for the saved recall)
+var API = require("../../utils/API");
 
-
-// Create the Search component
+// Create the Main component
 var Quotes = React.createClass({
 
-  // Here we set the initial state variables
-  // (this allows us to propagate the variables for maniuplation by the children components
-  // Also note the "results" state. This will be where we hold the data from our results
   getInitialState: function() {
-    return {
-      results: {}
-    };
+    return { savedQuotes: "" };
   },
 
-  // This function will be passed down into child components so they can change the "parent"
-  // i.e we will pass this method to the query component that way it can change the main component
-  // to perform a new search
-  setQuery: function(newQuery, newStart, newEnd) {
-    helpers.runQuery(newQuery, newStart, newEnd).then(function(data) {
-      this.setState({ results: { docs: data.docs } });
+  // When this component mounts, get all saved articles from our db
+  componentDidMount: function() {
+    API.getQuotes().then(function(quotesData) {
+      this.setState({ savedQuotes: quotesData.data });
+      console.log("saved results ", this.state.savedQuotes);
+    }.bind(this));
+  },
+  componentDidUpdate: function() {
+    console.log("UPDATED");
+  },
+
+  // This code handles the deleting saved articles from our database
+  handleClick: function(item) {
+    console.log("CLICKED");
+    console.log(item);
+
+    // Delete the list!
+    API.deleteQuote(item._id).then(function() {
+
+      // Get the revised list!
+      API.getQuotes().then(function(quotesData) {
+        this.setState({ savedQuotes: quotesData.data });
+        console.log("saved results", quotesData);
+      }.bind(this));
+
     }.bind(this));
   },
 
-  // Render the component. Note how we deploy both the Query and the Results Components
-  render: function() {
-    console.log("Render Results", this.state.results);
+  // This code handles the deleting saved articles from our database
+  handleClickFav: function(item) {
+    console.log("CLICKED FAV");
+    console.log(item);
+    // Get the revised list!
+    API.favoriteQuote(item).then(function(quotesData) {
+      console.log("just favorited", quotesData);
+    }.bind(this));
 
+    
+  },
+  // A helper method for rendering the HTML when we have no saved articles
+  renderEmpty: function() {
+    return (
+      <li className="list-group-item">
+        <h3>
+          <span>
+            <em>Save your first quote...</em>
+          </span>
+        </h3>
+      </li>
+    );
+  },
+
+  // A helper method for mapping through our articles and outputting some HTML
+  renderQuotes: function() {
+    //let quotes = this.state.savedQuotes.data;
+    return this.state.savedQuotes.map(function(quote, index) {
+      console.log("renders again after state change");
+      return (
+        <div key={index}>
+          <li className="list-group-item">
+            <h3>
+              <span>
+                <em>{quote.text}</em>
+              </span>
+              <span className="btn-group pull-right">
+                  <button className="btn btn-warning " onClick={() => this.handleClickFav(quote)}>Add as Favorite</button>
+                <button className="btn btn-danger" onClick={() => this.handleClick(quote)}>Delete</button>
+              </span>
+            </h3>
+          </li>
+        </div>
+      );
+    }.bind(this));
+  }, 
+  
+
+  // A helper method for rendering a container and all of our artiles inside
+  renderContainer: function() {
     return (
       <div className="main-container">
-
-        {/* Navbar */}
-          <nav className="navbar navbar-default" role="navigation">
-            <div className="container-fluid">
-              <div className="navbar-header">
-                <button
-                  type="button"
-                  className="navbar-toggle"
-                  data-toggle="collapse"
-                  data-target=".navbar-ex1-collapse">
-                  <span className="sr-only">Toggle navigation</span>
-                  <span className="icon-bar"></span>
-                  <span className="icon-bar"></span>
-                  <span className="icon-bar"></span>
-                </button>
-                <Link className="navbar-brand" to="/">NYT-React</Link>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="panel panel-success">
+              <div className="panel-heading">
+                <h1 className="panel-title">
+                  <strong>
+                    <i className="fa fa-download" aria-hidden="true"></i> Your Saved Quotes</strong>
+                </h1>
               </div>
-
-              <div className="collapse navbar-collapse navbar-ex1-collapse">
-                <ul className="nav navbar-nav navbar-right">
-                  {/* Using <Link> in place of <a> and "to" in place of "href" */}
-                  <li><Link to="/search">Search</Link></li>
-                  <li><Link to="/saved">Saved Articles</Link></li>
+              <div className="panel-body">
+                <ul className="list-group">
+                  {this.renderQuotes()}
                 </ul>
               </div>
             </div>
-          </nav>
+          </div>
+        </div>
       </div>
     );
+  },
+  // Our render method. Utilizing a few helper methods to keep this logic clean
+  render: function() {
+    // If we have no articles, we will return this.renderEmpty() which in turn returns some HTML
+    if (!this.state.savedQuotes) {
+      return this.renderEmpty();
+    }
+    // If we have articles, return this.renderContainer() which in turn returns all saves articles
+    return this.renderContainer();
   }
 });
 

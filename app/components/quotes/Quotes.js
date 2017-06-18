@@ -1,6 +1,7 @@
 // Include React as a dependency
 var React = require("react");
 var initialRender = true;
+var deleteClicked = false;
 // Include the Helper (for the saved recall)
 var API = require("../../utils/API");
 
@@ -27,7 +28,7 @@ var Quotes = React.createClass({
   handleClick: function(item) {
     console.log("CLICKED");
     console.log(item);
-
+    deleteClicked = true;
     // Delete the list!
     API.deleteQuote(item._id).then(function() {
 
@@ -69,7 +70,29 @@ var Quotes = React.createClass({
     if(initialRender === true){
       initialRender = false;
     return this.state.savedQuotes.map(function(quote, index) {
-      console.log("renders again after state change");
+      
+      return (
+        <div key={index}>
+          <li className="list-group-item">
+            <h3>
+              <span>
+                <em>{quote.text}</em>
+              </span>
+              <span className="btn-group pull-right">
+                  <button className="btn btn-warning " onClick={() => this.handleClickFav(quote)}>Add as Favorite</button>
+                <button className="btn btn-danger" onClick={() => this.handleClick(quote)}>Delete</button>
+              </span>
+            </h3>
+          </li>
+        </div>
+      );
+    }.bind(this));
+  }
+  else if (deleteClicked === true){
+    console.log("about to render deleted item");
+    deleteClicked = false;
+    return this.state.savedQuotes.map(function(quote, index) {
+      
       return (
         <div key={index}>
           <li className="list-group-item">
@@ -89,7 +112,7 @@ var Quotes = React.createClass({
   }
   else {
     return this.props.results.map(function(quote, index) {
-      console.log("renders again after state change");
+
       return (
         <div key={index}>
           <li className="list-group-item">

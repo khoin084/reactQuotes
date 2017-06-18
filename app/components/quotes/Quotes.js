@@ -1,6 +1,6 @@
 // Include React as a dependency
 var React = require("react");
-
+var initialRender = true;
 // Include the Helper (for the saved recall)
 var API = require("../../utils/API");
 
@@ -18,8 +18,9 @@ var Quotes = React.createClass({
       console.log("saved results ", this.state.savedQuotes);
     }.bind(this));
   },
-  componentDidUpdate: function() {
-    console.log("UPDATED");
+
+  componentWillMount: function () {
+    console.log("inside componentWillMount: ", this.state.savedQuotes);
   },
 
   // This code handles the deleting saved articles from our database
@@ -48,7 +49,6 @@ var Quotes = React.createClass({
       console.log("just favorited", quotesData);
     }.bind(this));
 
-    
   },
   // A helper method for rendering the HTML when we have no saved articles
   renderEmpty: function() {
@@ -66,6 +66,8 @@ var Quotes = React.createClass({
   // A helper method for mapping through our articles and outputting some HTML
   renderQuotes: function() {
     //let quotes = this.state.savedQuotes.data;
+    if(initialRender === true){
+      initialRender = false;
     return this.state.savedQuotes.map(function(quote, index) {
       console.log("renders again after state change");
       return (
@@ -84,6 +86,27 @@ var Quotes = React.createClass({
         </div>
       );
     }.bind(this));
+  }
+  else {
+    return this.props.results.map(function(quote, index) {
+      console.log("renders again after state change");
+      return (
+        <div key={index}>
+          <li className="list-group-item">
+            <h3>
+              <span>
+                <em>{quote.text}</em>
+              </span>
+              <span className="btn-group pull-right">
+                  <button className="btn btn-warning " onClick={() => this.handleClickFav(quote)}>Add as Favorite</button>
+                <button className="btn btn-danger" onClick={() => this.handleClick(quote)}>Delete</button>
+              </span>
+            </h3>
+          </li>
+        </div>
+      );
+    }.bind(this));
+  }
   }, 
   
 
@@ -113,6 +136,7 @@ var Quotes = React.createClass({
   },
   // Our render method. Utilizing a few helper methods to keep this logic clean
   render: function() {
+    
     // If we have no articles, we will return this.renderEmpty() which in turn returns some HTML
     if (!this.state.savedQuotes) {
       return this.renderEmpty();

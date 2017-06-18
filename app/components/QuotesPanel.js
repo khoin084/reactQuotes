@@ -22,16 +22,26 @@ var QuotesPanel = React.createClass({
 
   getQuotes: function() {
     API.getQuotes().then(function(quotesData) {
-        console.log(quotesData);
+        console.log("Quots.js to QuotesPanel.js" , quotesData);
         this.setState({ quotes: quotesData.data });
+        console.log("new state of quotes: ", this.state.quotes);
         console.log("saved quotes: ", quotesData.data);
         
     }.bind(this));
   },
 
+  // shouldComponentUpdate: function () {
+  //   console.log("determine if we should render again?");
+  //   return true;
+  // },
+
+  componentDidMount: function () {
+    console.log("snap-it mounted");
+  },
+
   // Render the component. Note how we deploy both the Input and the Quotes Components
   render: function() {
-    console.log("Render Quotes", this.state.quotes);
+    console.log("state of quotes in QuotesPanel.js: ", this.state.quotes);
 
     return (
       <div className="main-container">

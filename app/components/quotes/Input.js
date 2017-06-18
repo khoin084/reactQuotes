@@ -32,6 +32,10 @@ var Input= React.createClass({
     console.log("CLICKED");
     console.log(this.state.enteredQuote);
     API.saveQuote(this.state.enteredQuote);
+    API.getQuotes().then(function(quotesData) {
+      this.setState({ savedQuotes: quotesData.data });
+      console.log("saved results ", this.state.savedQuotes);
+    }.bind(this));
     this.props.displayQuotes();
   },
 
